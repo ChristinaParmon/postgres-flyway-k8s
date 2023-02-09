@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-postgres-k8s
+  labels:
+    name: springboot-postgres-k8s
+spec:
+  ports:
+    - nodePort: 30163
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: springboot-postgres-k8s
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-postgres-k8s
+spec:
+  selector:
+    matchLabels:
+      app: springboot-postgres-k8s
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: springboot-postgres-k8s
+    spec:
+      containers:
+        - name: springboot-postgres-k8s
+          image: springboot-postgres-k8s:1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: host
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: name
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: postgres_user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: postgres_password
+
+
