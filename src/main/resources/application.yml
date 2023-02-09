@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:5433/postgres
+    username: postgres
+    password: postgres
+  flyway:
+    baseline-on-migrate: true
+
+    validate-on-migrate: false
+
+server:
+  port: 8080
